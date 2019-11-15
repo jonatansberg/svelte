@@ -412,7 +412,7 @@ export default class ElementWrapper extends Wrapper {
 	}
 
 	get_render_statement(block: Block) {
-		const { name, namespace } = this.node;
+		const { name, namespace, dynamic_tag } = this.node;
 
 		if (namespace === namespaces.svg) {
 			return x`@svg_element("${name}")`;
@@ -425,6 +425,10 @@ export default class ElementWrapper extends Wrapper {
 		const is: AttributeWrapper = this.attributes.find(attr => attr.node.name === 'is') as any;
 		if (is) {
 			return x`@element_is("${name}", ${is.render_chunks(block).reduce((lhs, rhs) => x`${lhs} + ${rhs}`)})`;
+		}
+
+		if (dynamic_tag) {
+			return x`@element(#ctx.${dynamic_tag} || ${dynamic_tag})`;
 		}
 
 		return x`@element("${name}")`;
